@@ -1,4 +1,4 @@
-##ArcadeBoard-API
+# ArcadeBoard-API
 
 This license applies to the ArcadeBoard-API. It does not cover the implementation
 software named ArcadeBoard and ArcadeBoardDEV. These latter two projects are licensed under

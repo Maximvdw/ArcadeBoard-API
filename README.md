@@ -1,2 +1,2 @@
 # ArcadeBoard - API
-All rights received
+More information can be found on the Spigot Wiki

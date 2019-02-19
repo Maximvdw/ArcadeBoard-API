@@ -139,6 +139,13 @@ public interface GameManager {
     GameLobby createGameLobby(Game game, GamePlayer player);
 
     /**
+     * Remove game lobby
+     *
+     * @param lobby game lobby
+     */
+    void removeGameLobby(GameLobby lobby);
+
+    /**
      * Create a new game
      *
      * @param game game information

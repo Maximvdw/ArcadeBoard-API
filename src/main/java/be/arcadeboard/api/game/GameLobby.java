@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by Maxim on 7/01/2018.
  */
 public class GameLobby {
-    private Game game = null;
+    private Game<?> game = null;
     private List<GamePlayer> players = new ArrayList<GamePlayer>();
     private long creationTime = System.currentTimeMillis();
     private Map<GamePlayer, Boolean> readyState = new HashMap<GamePlayer, Boolean>();
@@ -26,7 +26,7 @@ public class GameLobby {
      *
      * @return Game
      */
-    public Game getGame() {
+    public Game<?> getGame() {
         return game;
     }
 
@@ -120,6 +120,8 @@ public class GameLobby {
      * @param player Player to add
      */
     public void addPlayer(GamePlayer player) {
+        if (player == null)
+            return;
         players.add(player);
         readyState.put(player, false);
     }

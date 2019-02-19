@@ -1,15 +1,12 @@
 package be.arcadeboard.api.game;
 
-import be.arcadeboard.api.player.GamePlayer;
-
 /**
  * GameState
  * Created by Maxim on 23/01/2018.
  */
 public interface GameState {
     /**
-     * Handle state
-     * @param gamePlayer Game player
+     * Game state loop
      */
-    void handle(GamePlayer gamePlayer);
+    void loop();
 }

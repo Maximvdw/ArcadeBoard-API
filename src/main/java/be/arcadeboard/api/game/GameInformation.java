@@ -170,7 +170,6 @@ public class GameInformation implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
         GameInformation that = (GameInformation) o;
 
@@ -187,11 +186,111 @@ public class GameInformation implements Serializable {
         return result;
     }
 
-    public Map<GameOption, Object> getGameOptions() {
+    /**
+     * Add an option
+     * <p>
+     * Unofficial deprecation: Please use setOption instead
+     *
+     * @param gameOption Game option to add
+     * @param value      value of option
+     */
+    public final void addOption(GameOption gameOption, Object value) {
+        setOption(gameOption, value);
+    }
+
+    /**
+     * Set an option
+     *
+     * @param gameOption Game option to add
+     * @param value      value of option
+     */
+    public final void setOption(GameOption gameOption, Object value) {
+        gameOptions.put(gameOption, value);
+    }
+
+    /**
+     * Get option
+     *
+     * @param gameOption game option
+     * @return value
+     */
+    public final Object getOption(GameOption gameOption) {
+        return gameOptions.get(gameOption);
+    }
+
+
+    /**
+     * Get option
+     *
+     * @param gameOption game option
+     * @return value
+     */
+    public final String getOptionString(GameOption gameOption) {
+        return (String) getOption(gameOption);
+    }
+
+
+    /**
+     * Get option
+     *
+     * @param gameOption game option
+     * @return value
+     */
+    public final Integer getOptionInt(GameOption gameOption) {
+        if (!hasOption(gameOption))
+            return 0;
+        return (Integer) getOption(gameOption);
+    }
+
+    /**
+     * Get option
+     *
+     * @param gameOption game option
+     * @return value
+     */
+    public final Boolean getOptionBoolean(GameOption gameOption) {
+        if (!hasOption(gameOption))
+            return false;
+        return (Boolean) getOption(gameOption);
+    }
+
+    /**
+     * Get option choice
+     *
+     * @param gameOption game option
+     * @return value
+     */
+    public final GameOption.Choice getOptionChoice(GameOption gameOption, GameOption.Choice defaultChoice) {
+        if (!hasOption(gameOption))
+            return defaultChoice;
+        return (GameOption.Choice) getOption(gameOption);
+    }
+
+    /**
+     * Check if the option is present
+     *
+     * @param gameOption game option
+     * @return has option
+     */
+    public final boolean hasOption(GameOption gameOption) {
+        return gameOptions.containsKey(gameOption);
+    }
+
+    /**
+     * Get game options
+     *
+     * @return game options
+     */
+    public final Map<GameOption, Object> getGameOptions() {
         return gameOptions;
     }
 
-    public void setGameOptions(Map<GameOption, Object> gameOptions) {
+    /**
+     * Set game options
+     *
+     * @param gameOptions Game options
+     */
+    public final void setGameOptions(Map<GameOption, Object> gameOptions) {
         this.gameOptions = gameOptions;
     }
 

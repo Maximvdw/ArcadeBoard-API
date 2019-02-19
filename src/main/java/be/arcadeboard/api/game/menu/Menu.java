@@ -1,7 +1,7 @@
 package be.arcadeboard.api.game.menu;
 
 import be.arcadeboard.api.game.Game;
-import be.arcadeboard.api.game.GameState;
+import be.arcadeboard.api.game.GamePlayerState;
 import be.arcadeboard.api.game.menu.items.MenuItem;
 import be.arcadeboard.api.game.menu.items.SelectableMenuItem;
 import be.arcadeboard.api.player.GamePlayer;
@@ -11,48 +11,21 @@ import be.arcadeboard.api.player.events.MouseClickEvent;
 import be.arcadeboard.api.player.events.MouseMoveEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public abstract class Menu implements Game.KeyListener, GameState, Game.MouseListener {
+public abstract class Menu implements Game.KeyListener, GamePlayerState, Game.MouseListener {
     private List<MenuItem> items = new ArrayList<MenuItem>();
-    private Map<GamePlayer, MenuItem> selectedItem = new HashMap<GamePlayer, MenuItem>();
-    private Map<GamePlayer, Map<String, Object>> menuStates = new HashMap<GamePlayer, Map<String, Object>>();
+    private SelectableMenuItem selectedItem = null;
     private Game game = null;
+    private GamePlayer gamePlayer = null;
     private float cursorX, cursorY = 0;
 
-    public Menu(Game game) {
+    public Menu(Game game, GamePlayer gamePlayer) {
         setGame(game);
+        setGamePlayer(gamePlayer);
+
         game.addKeyListener(this);
         game.addMouseListener(this);
-    }
-
-    /**
-     * Assign the menu to a player
-     *
-     * @param player Player to assign the menu to
-     * @return Menu instance
-     */
-    public Menu addPlayer(GamePlayer player) {
-        menuStates.put(player, new HashMap<String, Object>());
-        getGame().setPlayerState(player, this);
-        if (!getItems().isEmpty()) {
-            setSelectedItem(player, getItems().get(0));
-        }
-        return this;
-    }
-
-    /**
-     * Remove the player from the menu
-     *
-     * @param player Game player menu
-     * @return Menu instance
-     */
-    public Menu removePlayer(GamePlayer player) {
-        getGame().setPlayerState(player, null);
-        menuStates.remove(player);
-        return this;
     }
 
     public List<MenuItem> getItems() {
@@ -62,33 +35,10 @@ public abstract class Menu implements Game.KeyListener, GameState, Game.MouseLis
     public Menu addItem(MenuItem item) {
         item.setY(this.items.size());
         this.items.add(item);
+        if (selectedItem == null) {
+            setSelectedItem((SelectableMenuItem) item);
+        }
         return this;
-    }
-
-    public Boolean getMenuStateBoolean(GamePlayer gamePlayer, String key) {
-        Object state = getMenuState(gamePlayer, key);
-        if (state == null) {
-            return false;
-        } else {
-            return (Boolean) state;
-        }
-    }
-
-    public Integer getMenuStateInteger(GamePlayer gamePlayer, String key) {
-        Object state = getMenuState(gamePlayer, key);
-        if (state == null) {
-            return 0;
-        } else {
-            return (Integer) state;
-        }
-    }
-
-    public Object getMenuState(GamePlayer gamePlayer, String key) {
-        return menuStates.get(gamePlayer).get(key);
-    }
-
-    public void setMenuState(GamePlayer gamePlayer, String key, Object value) {
-        menuStates.get(gamePlayer).put(key, value);
     }
 
     /**
@@ -100,35 +50,33 @@ public abstract class Menu implements Game.KeyListener, GameState, Game.MouseLis
 
     public void onKeyDown(KeyDownEvent event) {
         GamePlayer gamePlayer = event.getGamePlayer();
-        if (!menuStates.containsKey(gamePlayer))
+        if (!getGamePlayer().equals(gamePlayer)) {
             return;
+        }
 
         // Avoid other menu's triggering
         event.setCancelled(true);
-        int currentIdx = getItems().indexOf(getSelectedItem(event.getGamePlayer()));
+        int currentIdx = getItems().indexOf(getSelectedItem());
         switch (event.getKey()) {
             case UP:
                 if (currentIdx != 0) {
                     // Move up
                     currentIdx--;
-                    setSelectedItem(event.getGamePlayer(), getItems().get(currentIdx));
+                    setSelectedItem((SelectableMenuItem) getItems().get(currentIdx));
                 }
                 break;
             case DOWN:
                 if (currentIdx != getItems().size() - 1) {
                     // Move down
                     currentIdx++;
-                    setSelectedItem(event.getGamePlayer(), getItems().get(currentIdx));
+                    setSelectedItem((SelectableMenuItem) getItems().get(currentIdx));
                 }
                 break;
             case JUMP:
-                if (getSelectedItem(gamePlayer) instanceof SelectableMenuItem) {
-                    ((SelectableMenuItem) getSelectedItem(gamePlayer)).onClick(gamePlayer);
-                }
+                getSelectedItem().onClick(gamePlayer);
                 break;
             case SNEAK:
                 onForceQuit(gamePlayer);
-                removePlayer(gamePlayer);
                 break;
         }
     }
@@ -137,12 +85,12 @@ public abstract class Menu implements Game.KeyListener, GameState, Game.MouseLis
 
     }
 
-    public MenuItem getSelectedItem(GamePlayer gamePlayer) {
-        return selectedItem.get(gamePlayer);
+    public SelectableMenuItem getSelectedItem() {
+        return selectedItem;
     }
 
-    public void setSelectedItem(GamePlayer gamePlayer, MenuItem selectedItem) {
-        this.selectedItem.put(gamePlayer, selectedItem);
+    public void setSelectedItem(SelectableMenuItem selectedItem) {
+        this.selectedItem = selectedItem;
     }
 
     /**
@@ -172,9 +120,11 @@ public abstract class Menu implements Game.KeyListener, GameState, Game.MouseLis
      */
     public void onMouseMove(MouseMoveEvent event) {
         GamePlayer gamePlayer = event.getGamePlayer();
-        if (!menuStates.containsKey(gamePlayer))
+        if (!getGamePlayer().equals(gamePlayer)) {
             return;
-        int currentIdx = getItems().indexOf(getSelectedItem(event.getGamePlayer()));
+        }
+
+        int currentIdx = getItems().indexOf(getSelectedItem());
 
         float oldCursorY = cursorY;
         float oldCursorX = cursorX;
@@ -187,13 +137,13 @@ public abstract class Menu implements Game.KeyListener, GameState, Game.MouseLis
             if (currentIdx != 0) {
                 // Move up
                 currentIdx--;
-                setSelectedItem(event.getGamePlayer(), getItems().get(currentIdx));
+                setSelectedItem((SelectableMenuItem) getItems().get(currentIdx));
             }
         } else if (deltaY < 0) {
             if (currentIdx != getItems().size() - 1) {
                 // Move down
                 currentIdx++;
-                setSelectedItem(event.getGamePlayer(), getItems().get(currentIdx));
+                setSelectedItem((SelectableMenuItem) getItems().get(currentIdx));
             }
         }
     }
@@ -205,13 +155,20 @@ public abstract class Menu implements Game.KeyListener, GameState, Game.MouseLis
      */
     public void onMouseClick(MouseClickEvent event) {
         GamePlayer gamePlayer = event.getGamePlayer();
-        if (!menuStates.containsKey(gamePlayer))
+        if (!getGamePlayer().equals(gamePlayer)) {
             return;
+        }
 
         if (event.getMouseKey().equals(MouseClickEvent.MouseKey.LEFT)) {
-            if (getSelectedItem(gamePlayer) instanceof SelectableMenuItem) {
-                ((SelectableMenuItem) getSelectedItem(gamePlayer)).onClick(gamePlayer);
-            }
+            getSelectedItem().onClick(gamePlayer);
         }
+    }
+
+    public GamePlayer getGamePlayer() {
+        return gamePlayer;
+    }
+
+    private final void setGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayer = gamePlayer;
     }
 }

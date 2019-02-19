@@ -71,7 +71,12 @@ public enum GameOption {
     /**
      * Enable black background
      */
-    BACKGROUND(Choice.class);
+    BACKGROUND(Choice.class),
+    /**
+     * Visibility in the game menu
+     * Default: true
+     */
+    VISIBLE(Boolean.class);
 
     private Class<?> type = Object.class;
 

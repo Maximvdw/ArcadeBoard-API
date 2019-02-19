@@ -7,9 +7,6 @@ import be.arcadeboard.api.game.events.GamePlayerJoinEvent;
 import be.arcadeboard.api.game.events.GamePlayerLeaveEvent;
 import be.arcadeboard.api.game.events.GameStartEvent;
 import be.arcadeboard.api.game.graphics.Canvas;
-import be.arcadeboard.api.game.statistics.Statistic;
-import be.arcadeboard.api.game.statistics.StatisticInterval;
-import be.arcadeboard.api.game.statistics.StatisticType;
 import be.arcadeboard.api.implementation.UserInterfaceHandler;
 import be.arcadeboard.api.player.GamePlayer;
 import be.arcadeboard.api.player.events.KeyDownEvent;
@@ -31,7 +28,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,7 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * ex.
  * "... extends Game<CharacterCanvas>"
  */
-public abstract class Game<T extends Canvas> extends GameInformation implements Runnable {
+public abstract class Game<T extends Canvas> extends GameInformation implements Runnable, GameState {
     private UUID uuid = UUID.randomUUID();
     private float currentFps = 0;
     private float fps = 0;
@@ -63,16 +59,19 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
     private File configFile = null;
     private File dataFolder = null;
 
+    // Ticks and state
+    private long ticks = 0L;
+    private GameState gameState = this;
+    private long gameStateTicks = 0L;
+
     // Ordered player lists
     private List<GamePlayer> players = new ArrayList<GamePlayer>();
-    private Map<GamePlayer, GameState> playerStates = new HashMap<GamePlayer, GameState>();
+    private Map<GamePlayer, GamePlayerState> playerStates = new HashMap<GamePlayer, GamePlayerState>();
+    private Map<GamePlayer, Long> playerStateTicks = new HashMap<GamePlayer, Long>();
 
     // Player data specific to game
     private Map<GamePlayer, T> playerCanvas = new ConcurrentHashMap<GamePlayer, T>();
     private Class<T> canvasClass;
-
-    // Total ticks
-    private long ticks = 0L;
 
     // Listeners
     private List<MouseClickListener> mouseClickListeners = new ArrayList<MouseClickListener>();
@@ -97,6 +96,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         setOption(GameOption.MINIMUM_PLAYERS, 1);                           // Game has a minimum amount of players of 1
         setOption(GameOption.MAXIMUM_PLAYERS, 1);                           // Game has a maximum amount of players of 1
         setOption(GameOption.BACKGROUND, GameOption.Choice.OPT_OUT);
+        setOption(GameOption.VISIBLE,true);
 
         setGameClass((Class<? extends Game>) this.getClass().getSuperclass());
 
@@ -271,6 +271,17 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         addMouseMoveListener(mouseListener);
     }
 
+    /**
+     * Remove a mouse click listener
+     *
+     * @param mouseClickListener Mouse click listener
+     */
+    public final void removeMouseClickListener(MouseClickListener mouseClickListener) {
+        if (mouseClickListeners.contains(mouseClickListener)) {
+            mouseClickListeners.remove(mouseClickListener);
+        }
+    }
+
     public final List<KeyUpListener> getKeyUpListeners() {
         return keyUpListeners;
     }
@@ -306,8 +317,32 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * @param gamePlayer game player
      * @return player state
      */
-    public final GameState getPlayerState(GamePlayer gamePlayer) {
+    public final GamePlayerState getPlayerState(GamePlayer gamePlayer) {
         return playerStates.get(gamePlayer);
+    }
+
+    /**
+     * Get game state ticks
+     *
+     * @return game state ticks
+     */
+    public final long getGameStateTicks() {
+        return gameStateTicks;
+    }
+
+    /**
+     * Get player state ticks
+     *
+     * @param gamePlayer Game player
+     * @return player state ticks
+     */
+    public final long getPlayerStateTicks(GamePlayer gamePlayer) {
+        Long ticks = playerStateTicks.get(gamePlayer);
+        if (ticks == null) {
+            return -1;
+        } else {
+            return ticks;
+        }
     }
 
     /**
@@ -317,7 +352,21 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      */
     public final void removePlayerState(GamePlayer gamePlayer) {
         if (playerStates.containsKey(gamePlayer)) {
+            GamePlayerState currentState = playerStates.get(gamePlayer);
+            if (getMouseMoveListeners().contains(currentState)) {
+                mouseMoveListeners.remove(currentState);
+            }
+            if (getMouseClickListeners().contains(currentState)) {
+                mouseClickListeners.remove(currentState);
+            }
+            if (getKeyDownListeners().contains(currentState)) {
+                keyDownListeners.remove(currentState);
+            }
+            if (getKeyUpListeners().contains(currentState)) {
+                keyUpListeners.remove(currentState);
+            }
             playerStates.remove(gamePlayer);
+            playerStateTicks.remove(gamePlayer);
         }
     }
 
@@ -327,14 +376,11 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * @param gamePlayer game player state
      * @param state      player state
      */
-    public final void setPlayerState(GamePlayer gamePlayer, GameState state) {
+    public final void setPlayerState(GamePlayer gamePlayer, GamePlayerState state) {
+        removePlayerState(gamePlayer);
         playerStates.put(gamePlayer, state);
+        playerStateTicks.put(gamePlayer, 0L);
     }
-
-    /**
-     * Game loop
-     */
-    public abstract void loop();
 
     /**
      * On game start
@@ -388,8 +434,11 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
                     lastFPSCalc = System.currentTimeMillis();
                 }
                 currentFps++;
+
                 // Game loop
+                gameStateTicks++;
                 loop();
+
                 // Handle update
                 if (isRunning()) {
                     getUserInterfaceHandler().update(playerCanvas);
@@ -455,6 +504,11 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * @param gamePlayer Player to add
      */
     public final boolean addPlayer(final GamePlayer gamePlayer) {
+        // Check if the player is in another game
+        if (getPlugin().getGameManager().isPlaying(gamePlayer)) {
+            return false;
+        }
+
         if (getOptionBoolean(GameOption.GLOBAL_CANVAS)) {
             if (getMainCanvas() == null) {
                 T newCanvas = createCanvas(getOptionInt(GameOption.SCREEN_WIDTH), getOptionInt(GameOption.SCREEN_HEIGHT));
@@ -465,7 +519,19 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
             playerCanvas.put(gamePlayer, createCanvas(getOptionInt(GameOption.SCREEN_WIDTH), getOptionInt(GameOption.SCREEN_HEIGHT)));
         }
         players.add(gamePlayer);
-        onPlayerJoin(new GamePlayerJoinEvent(this, gamePlayer));
+        GamePlayerJoinEvent playerJoinEvent = new GamePlayerJoinEvent(this, gamePlayer);
+        onPlayerJoin(playerJoinEvent);
+        if (playerJoinEvent.isCancelled()) {
+            playerCanvas.remove(gamePlayer);
+            players.remove(gamePlayer);
+            removePlayerState(gamePlayer);
+
+            // Do not use minimum players here, there might be a lobby
+            if (players.size() < 1) {
+                stop();
+            }
+            return false;
+        }
         // Any UI based implementation will have to be constructed on the main thread
         Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
             public void run() {
@@ -488,6 +554,9 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         if (players.contains(gamePlayer)) {
             players.remove(gamePlayer);
             playerCanvas.remove(gamePlayer);
+            removePlayerState(gamePlayer);
+
+            // Do not use minimum players here, there might be a lobby
             if (players.size() < 1) {
                 stop();
             }
@@ -753,114 +822,6 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
     }
 
     /**
-     * Get game options
-     *
-     * @return game options
-     */
-    public final Map<GameOption, Object> getGameOptions() {
-        return gameOptions;
-    }
-
-    /**
-     * Set game options
-     *
-     * @param gameOptions Game options
-     */
-    public final void setGameOptions(Map<GameOption, Object> gameOptions) {
-        this.gameOptions = gameOptions;
-    }
-
-    /**
-     * Add an option
-     * <p>
-     * Unofficial deprecation: Please use setOption instead
-     *
-     * @param gameOption Game option to add
-     * @param value      value of option
-     */
-    public final void addOption(GameOption gameOption, Object value) {
-        setOption(gameOption, value);
-    }
-
-    /**
-     * Set an option
-     *
-     * @param gameOption Game option to add
-     * @param value      value of option
-     */
-    public final void setOption(GameOption gameOption, Object value) {
-        gameOptions.put(gameOption, value);
-    }
-
-    /**
-     * Get option
-     *
-     * @param gameOption game option
-     * @return value
-     */
-    public final Object getOption(GameOption gameOption) {
-        return gameOptions.get(gameOption);
-    }
-
-
-    /**
-     * Get option
-     *
-     * @param gameOption game option
-     * @return value
-     */
-    public final String getOptionString(GameOption gameOption) {
-        return (String) getOption(gameOption);
-    }
-
-
-    /**
-     * Get option
-     *
-     * @param gameOption game option
-     * @return value
-     */
-    public final Integer getOptionInt(GameOption gameOption) {
-        if (!hasOption(gameOption))
-            return 0;
-        return (Integer) getOption(gameOption);
-    }
-
-    /**
-     * Get option
-     *
-     * @param gameOption game option
-     * @return value
-     */
-    public final Boolean getOptionBoolean(GameOption gameOption) {
-        if (!hasOption(gameOption))
-            return false;
-        return (Boolean) getOption(gameOption);
-    }
-
-    /**
-     * Get option choice
-     *
-     * @param gameOption game option
-     * @return value
-     */
-    public final GameOption.Choice getOptionChoice(GameOption gameOption, GameOption.Choice defaultChoice) {
-        if (!hasOption(gameOption))
-            return defaultChoice;
-        return (GameOption.Choice) getOption(gameOption);
-    }
-
-    /**
-     * Check if the option is present
-     *
-     * @param gameOption game option
-     * @return has option
-     */
-    public final boolean hasOption(GameOption gameOption) {
-        return gameOptions.containsKey(gameOption);
-    }
-
-    /**
      * Add an option
      *
      * @param key   Game option to add
@@ -980,6 +941,43 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      */
     public final void resetCanvas(GamePlayer gamePlayer) {
         resetCanvas(gamePlayer, getOptionInt(GameOption.SCREEN_WIDTH), getOptionInt(GameOption.SCREEN_HEIGHT));
+    }
+
+    /**
+     * Get current game state
+     *
+     * @return game state
+     */
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    /**
+     * Set game state
+     *
+     * @param gameState game state
+     */
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+        this.gameStateTicks = 0L;
+    }
+
+    /**
+     * Get available game lobby
+     *
+     * @return game lobby
+     */
+    public GameLobby getAvailableLobby() {
+        return getPlugin().getGameManager().getGameLobbyByGame(this);
+    }
+
+    /**
+     * Create game lobby
+     *
+     * @return game lobby
+     */
+    public GameLobby createLobby() {
+        return getPlugin().getGameManager().createGameLobby(this, null);
     }
 
     /**

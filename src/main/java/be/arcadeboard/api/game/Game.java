@@ -520,6 +520,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         }
         players.add(gamePlayer);
         GamePlayerJoinEvent playerJoinEvent = new GamePlayerJoinEvent(this, gamePlayer);
+        Bukkit.getPluginManager().callEvent(playerJoinEvent);
         onPlayerJoin(playerJoinEvent);
         if (playerJoinEvent.isCancelled()) {
             playerCanvas.remove(gamePlayer);
@@ -549,6 +550,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      */
     public final boolean removePlayer(GamePlayer gamePlayer) {
         GamePlayerLeaveEvent gamePlayerLeaveEvent = new GamePlayerLeaveEvent(this, gamePlayer);
+        Bukkit.getPluginManager().callEvent(gamePlayerLeaveEvent);
         onPlayerLeave(gamePlayerLeaveEvent);
 
         if (players.contains(gamePlayer)) {

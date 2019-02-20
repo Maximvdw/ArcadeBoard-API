@@ -1,79 +1,33 @@
 package be.arcadeboard.api.server;
 
-import javax.websocket.*;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
 import java.net.URI;
-import java.net.URISyntaxException;
 
-@ClientEndpoint
-public class GameClient {
-    private GameServer server = null;
-    private Session userSession = null;
+public class GameClient extends WebSocketClient {
 
-    /**
-     * Connect to a game server
-     *
-     * @param uri URI to connect to
-     * @throws URISyntaxException
-     */
-    public void connect(String uri) throws Exception {
-        connect(new URI(uri));
-        connect();
+    public GameClient(URI serverUri) {
+        super(serverUri);
     }
 
-    /**
-     * Connect to a game server
-     *
-     * @param address server address
-     * @param port    server port
-     * @param path    server path
-     * @param secure  secure websockets
-     * @throws URISyntaxException
-     */
-    public void connect(String address, int port, String path, boolean secure) throws Exception {
-        server = new GameServer(address, port, path, secure);
-        connect();
+    @Override
+    public void onOpen(ServerHandshake serverHandshake) {
+        System.out.println("Client: open");
     }
 
-    /**
-     * Connect to a game server
-     *
-     * @param uri URI to connect to
-     */
-    public void connect(URI uri) throws Exception {
-        server = new GameServer(uri);
-        connect();
+    @Override
+    public void onMessage(String s) {
+
     }
 
-    private void connect() throws Exception {
-        if (server == null) {
-            throw new Exception("Server is not declared!");
-        }
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        container.connectToServer(this, getServer().getURI());
+    @Override
+    public void onClose(int i, String s, boolean b) {
+        System.out.println("Client: close");
     }
 
-    public GameServer getServer(){
-        return this.server;
-    }
-
-    /**
-     * Callback hook for Connection open events.
-     *
-     * @param userSession the userSession which is opened.
-     */
-    @OnOpen
-    public void onOpen(Session userSession) {
-        this.userSession = userSession;
-    }
-
-    /**
-     * Callback hook for Connection close events.
-     *
-     * @param userSession the userSession which is getting closed.
-     * @param reason      the reason for connection close
-     */
-    @OnClose
-    public void onClose(Session userSession, CloseReason reason) {
-        this.userSession = null;
+    @Override
+    public void onError(Exception e) {
+        e.printStackTrace();
     }
 }

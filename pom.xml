@@ -15,9 +15,9 @@
             <version>1.12.1-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.4.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -48,7 +48,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>javax.websocket:*</include>
+                                    <include>org.java-websocket:*</include>
                                     <include>com.google.code.gson:*</include>
                                 </includes>
                             </artifactSet>
@@ -58,7 +58,7 @@
                                     <shadedPattern>be.arcadeboard.gson</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>javax.websocket</pattern>
+                                    <pattern>org.java_websocket</pattern>
                                     <shadedPattern>be.arcadeboard.websocket</shadedPattern>
                                 </relocation>
                             </relocations>

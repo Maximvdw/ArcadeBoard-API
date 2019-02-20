@@ -1,115 +1,83 @@
 package be.arcadeboard.api.server;
 
-import be.arcadeboard.api.server.protocol.Message;
-import be.arcadeboard.api.server.protocol.MessageDecoder;
-import be.arcadeboard.api.server.protocol.MessageEncoder;
 
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
+import org.java_websocket.server.WebSocketServer;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.security.*;
+import java.security.cert.CertificateException;
 
-@ServerEndpoint(value = "{path}",
-        decoders = MessageDecoder.class,
-        encoders = MessageEncoder.class)
-public class GameServer {
-    private URI uri = null;
-    private String path = "";
-    private Session session;
-    private static Set<GameClient> gameClients = new CopyOnWriteArraySet<GameClient>();
-    private static HashMap<String, String> users = new HashMap<String, String>();
-
-    public GameServer(int port, String path) {
-        setPath(path);
+public class GameServer extends WebSocketServer {
+    public GameServer(int port) throws UnknownHostException {
+        super(new InetSocketAddress(port));
     }
 
-    protected GameServer(URI uri) {
-        setURI(uri);
-    }
-
-    protected GameServer(String address, int port, String path, boolean secure) throws URISyntaxException {
-        setURI(new URI((secure ? "wss" : "ws") + "://" + address + ":" + port + path));
-    }
-
-    public static Set<GameClient> getGameClients() {
-        return gameClients;
-    }
-
-    public static void setGameClients(Set<GameClient> gameClients) {
-        GameServer.gameClients = gameClients;
-    }
-
-    @OnOpen
-    public void onConnectionOpen(final Session session, @PathParam("path") final String path) {
-        session.getUserProperties().put("path", path); // Set path
-    }
-
-    @OnMessage
-    public void onMessage(Session session, Message message)
-            throws IOException {
-
-        //message.setFrom(users.get(session.getId()));
+    public GameServer(InetSocketAddress address) {
+        super(address);
     }
 
     /**
-     * Get server address
+     * Configure SSL on the server
      *
-     * @return server address
+     * @param storeType     Store type (JKS)
+     * @param keystore      Key store file (file.jks)
+     * @param storePassword Store password
+     * @param keyPassword   Key password
+     * @throws KeyStoreException
+     * @throws FileNotFoundException
      */
-    public String getAddress() {
-        return getURI().getHost();
+    public void configureSSL(String storeType, File keystore, String storePassword, String keyPassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
+        // load up the key store
+        KeyStore ks = KeyStore.getInstance(storeType);
+        ks.load(new FileInputStream(keystore), storePassword.toCharArray());
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        kmf.init(ks, keyPassword.toCharArray());
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+        tmf.init(ks);
+
+        SSLContext sslContext = null;
+        sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+        setWebSocketFactory(new DefaultSSLWebSocketServerFactory(sslContext));
     }
 
+    @Override
+    public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
 
-    /**
-     * Get server port
-     *
-     * @return server port
-     */
-    public int getPort() {
-        return getURI().getPort();
     }
 
-    /**
-     * Get server URI
-     *
-     * @return server URI
-     */
-    public URI getURI() {
-        return uri;
+    @Override
+    public void onClose(WebSocket webSocket, int i, String s, boolean b) {
+
     }
 
-    /**
-     * Set server URI
-     *
-     * @param uri server URI
-     */
-    public void setURI(URI uri) {
-        this.uri = uri;
+    @Override
+    public void onMessage(WebSocket webSocket, String s) {
+
     }
 
-    /**
-     * Get server path
-     *
-     * @return server path
-     */
-    public String getPath() {
-        return path;
+    @Override
+    public void onError(WebSocket webSocket, Exception e) {
+e.printStackTrace();
     }
 
-    /**
-     * Set server path
-     *
-     * @param path server path
-     */
-    public void setPath(String path) {
-        this.path = path;
+    @Override
+    public void onStart() {
+        // Default connection timeout
+        setConnectionLostTimeout(0);
+        setConnectionLostTimeout(100);
     }
 }

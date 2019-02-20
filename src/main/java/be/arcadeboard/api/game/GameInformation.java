@@ -1,5 +1,6 @@
 package be.arcadeboard.api.game;
 
+import com.google.gson.annotations.Expose;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -19,8 +20,11 @@ public class GameInformation implements Serializable {
     private String controls = "";
     private String author = "";
     private String version = "";
+    @Expose
     private Class<? extends Game> gameClass = null;
+    @Expose
     private File jarFile = null;
+    @Expose
     private Map<GameOption, Object> gameOptions = new HashMap<GameOption, Object>();
 
     public GameInformation(Class<? extends Game> gameClass) {

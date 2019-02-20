@@ -1,6 +1,7 @@
 package be.arcadeboard.api.server;
 
 
+import be.arcadeboard.api.server.packets.Packet;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
@@ -17,8 +18,12 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameServer extends WebSocketServer {
+    private Map<Integer,Packet> packetMap = new HashMap<>();
+
     public GameServer(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
     }
@@ -28,7 +33,7 @@ public class GameServer extends WebSocketServer {
     }
 
     /**
-     * Configure SSL on the server
+     * Configure TLS on the server
      *
      * @param storeType     Store type (JKS)
      * @param keystore      Key store file (file.jks)
@@ -37,7 +42,7 @@ public class GameServer extends WebSocketServer {
      * @throws KeyStoreException
      * @throws FileNotFoundException
      */
-    public void configureSSL(String storeType, File keystore, String storePassword, String keyPassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
+    public void configureTLS(String storeType, File keystore, String storePassword, String keyPassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException, KeyManagementException {
         // load up the key store
         KeyStore ks = KeyStore.getInstance(storeType);
         ks.load(new FileInputStream(keystore), storePassword.toCharArray());
@@ -79,5 +84,13 @@ e.printStackTrace();
         // Default connection timeout
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
+    }
+
+    public Map<Integer, Packet> getPacketMap() {
+        return packetMap;
+    }
+
+    public void setPacketMap(Map<Integer, Packet> packetMap) {
+        this.packetMap = packetMap;
     }
 }

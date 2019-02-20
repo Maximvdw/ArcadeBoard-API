@@ -28,12 +28,14 @@ public class GameServerTest {
 
     @Before
     public void setup() throws UnknownHostException {
+        System.out.println("Creating higher lower server on port 6028 ...");
         server = new HigherLowerServer(6028);
         server.start();
     }
 
     @Test
     public void testConnection() throws Exception {
+        System.out.println("Connecting to higher lower server ...");
         HigherLowerClient client = new HigherLowerClient(new URI("ws://localhost:6028"));
         client.connect();
     }

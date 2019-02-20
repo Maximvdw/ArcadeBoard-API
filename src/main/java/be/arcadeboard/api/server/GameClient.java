@@ -1,11 +1,15 @@
 package be.arcadeboard.api.server;
 
+import be.arcadeboard.api.server.packets.Packet;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameClient extends WebSocketClient {
+    private Map<Integer,Packet> packetMap = new HashMap<>();
 
     public GameClient(URI serverUri) {
         super(serverUri);
@@ -29,5 +33,13 @@ public class GameClient extends WebSocketClient {
     @Override
     public void onError(Exception e) {
         e.printStackTrace();
+    }
+
+    public Map<Integer, Packet> getPacketMap() {
+        return packetMap;
+    }
+
+    public void setPacketMap(Map<Integer, Packet> packetMap) {
+        this.packetMap = packetMap;
     }
 }

@@ -1,4 +1,8 @@
 package be.arcadeboard.api.server.packets;
 
-public abstract class PacketOut extends Packet{
+/**
+ * Packets sent by the game server
+ */
+public abstract class PacketOut extends Packet {
+
 }

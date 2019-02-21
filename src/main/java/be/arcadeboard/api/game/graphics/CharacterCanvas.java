@@ -51,10 +51,10 @@ public class CharacterCanvas extends Canvas {
      */
     public List<String> getHorizontalLines() {
         List<String> lines = new ArrayList<String>();
-        for (int i = 0; i < getHeight(); i++) {
+        for (int y = 0; y < getHeight(); y++) {
             StringBuilder line = new StringBuilder();
             for (int x = 0; x < characterPixels.length; x++) {
-                CharacterPixel characterPixel = characterPixels[x][i];
+                CharacterPixel characterPixel = characterPixels[x][y];
                 line.append(characterPixel.getContent());
             }
             lines.add(line.toString());
@@ -169,6 +169,9 @@ public class CharacterCanvas extends Canvas {
         content = ChatColor.translateAlternateColorCodes('&', content);
         String colors = ChatColor.getLastColors(content);
         content = ChatColor.stripColor(content);
+        boolean requiresColorReset = !colors.isEmpty();
+        assert x + content.length() < characterPixels.length;
+
         for (int i = 0; i < content.length(); i++) {
             Character character = content.charAt(i);
             if (i == 0) {
@@ -178,6 +181,15 @@ public class CharacterCanvas extends Canvas {
                     ResourceIcon fontCharacter = font.getCharacter(character);
                     if (fontCharacter != null) {
                         characterPixels[x + i][y] = new CharacterPixel(colors + fontCharacter);
+                    }
+                }
+            } else if (i == content.length() - 1 && requiresColorReset) {
+                if (character == ' ') {
+                    characterPixels[x + i][y] = new CharacterPixel(ColorResource.TRANSPARENT.toString()  + ChatColor.RESET);
+                } else {
+                    ResourceIcon fontCharacter = font.getCharacter(character);
+                    if (fontCharacter != null) {
+                        characterPixels[x + i][y] = new CharacterPixel(String.valueOf(fontCharacter) + ChatColor.RESET);
                     }
                 }
             } else {

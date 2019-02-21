@@ -15,6 +15,6 @@ CI: http://ci.mvdw-software.com/job/ArcadeBoard-API/
 <dependency>
   <groupId>be.arcadeboard</groupId>
   <artifactId>ArcadeBoard-API</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
 </dependency>
 ```

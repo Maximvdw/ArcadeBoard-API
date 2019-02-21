@@ -180,6 +180,14 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         }
 
         onGameStart(startEvent);
+
+        if (getOptionBoolean(GameOption.GLOBAL_CANVAS)) {
+            if (getMainCanvas() == null) {
+                T newCanvas = createCanvas(getOptionInt(GameOption.SCREEN_WIDTH), getOptionInt(GameOption.SCREEN_HEIGHT));
+                setMainCanvas(newCanvas);
+            }
+        }
+
         running = true;
         task = Bukkit.getScheduler().runTaskAsynchronously(plugin, this).getTaskId();
         getPlugin().getGameManager().addRunningGame(this);

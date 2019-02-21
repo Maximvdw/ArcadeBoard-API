@@ -14,9 +14,7 @@ public class ResourceFont {
     static {
         try {
             defaultFont = new ResourceFont("default", ResourceFont.class.getResourceAsStream("/fonts/default.ttf"), 20);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (FontFormatException e) {
+        } catch (IOException | FontFormatException e) {
             e.printStackTrace();
         }
     }
@@ -59,7 +57,7 @@ public class ResourceFont {
      */
     public String convert(String original) {
         StringBuilder converted = new StringBuilder();
-        for (char c : original.toCharArray()){
+        for (char c : original.toCharArray()) {
             converted.append(getCharacter(c).toString());
         }
         return converted.toString();
@@ -106,6 +104,11 @@ public class ResourceFont {
         return characters;
     }
 
+    /**
+     * Get font name
+     *
+     * @return font name
+     */
     public String getName() {
         return name;
     }

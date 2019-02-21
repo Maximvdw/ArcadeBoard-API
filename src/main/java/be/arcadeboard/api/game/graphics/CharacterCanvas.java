@@ -170,7 +170,7 @@ public class CharacterCanvas extends Canvas {
         String colors = ChatColor.getLastColors(content);
         content = ChatColor.stripColor(content);
         boolean requiresColorReset = !colors.isEmpty();
-        assert x + content.length() < characterPixels.length;
+        assert x + content.length() < characterPixels.length - 1;
 
         for (int i = 0; i < content.length(); i++) {
             Character character = content.charAt(i);

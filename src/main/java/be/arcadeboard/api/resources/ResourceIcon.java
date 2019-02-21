@@ -31,7 +31,7 @@ public class ResourceIcon extends ResourceImage {
     @Override
     public void setImage(BufferedImage image) {
         if (image.getHeight() != 16 || image.getWidth() != 16) {
-            // Not correct size, resize
+            // TODO: Not correct size, resize
         } else {
             this.image = image;
         }

@@ -81,7 +81,7 @@ public class ResourceImage {
         BufferedImage src = getImage();
         int width = src.getWidth();
         int height = src.getHeight();
-        BufferedImage dest = new BufferedImage(height, width, src.getType());
+        BufferedImage dest = new BufferedImage(width, height, src.getType());
         Graphics2D graphics2D = dest.createGraphics();
         graphics2D.translate((height - width) / 2, (height - width) / 2);
         graphics2D.rotate((Math.PI / 2) * rotation, height / 2, width / 2);
@@ -106,7 +106,9 @@ public class ResourceImage {
     public void setImage(BufferedImage image) {
         this.image = image;
         // Split image
-        if (this.image.getHeight() % 16 == 0 && this.image.getWidth() % 16 == 0){
+        int heightDiff = this.image.getHeight() % 16;
+        int widthDiff = this.image.getWidth() % 16;
+        if (heightDiff == 0 && widthDiff % 16 == 0){
             // Correct dimensions
             final int width = 16;
             final int height = 16;
@@ -128,6 +130,12 @@ public class ResourceImage {
                     }
                 }
             }
+        }else{
+            // Pad image
+            BufferedImage newImage = new BufferedImage(this.image.getWidth() + widthDiff, this.image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            // Center image
+            newImage.getGraphics().drawImage(image, widthDiff / 2, heightDiff / 2, null);
+            setImage(newImage);
         }
     }
 

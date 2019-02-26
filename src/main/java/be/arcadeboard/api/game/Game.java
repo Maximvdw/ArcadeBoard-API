@@ -96,7 +96,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         setOption(GameOption.MINIMUM_PLAYERS, 1);                           // Game has a minimum amount of players of 1
         setOption(GameOption.MAXIMUM_PLAYERS, 1);                           // Game has a maximum amount of players of 1
         setOption(GameOption.BACKGROUND, GameOption.Choice.OPT_OUT);
-        setOption(GameOption.VISIBLE,true);
+        setOption(GameOption.VISIBLE, true);
 
         setGameClass((Class<? extends Game>) this.getClass().getSuperclass());
 
@@ -189,7 +189,9 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         }
 
         running = true;
-        task = Bukkit.getScheduler().runTaskAsynchronously(plugin, this).getTaskId();
+        if (getOptionInt(GameOption.TPS) != -1) {
+            task = Bukkit.getScheduler().runTaskAsynchronously(plugin, this).getTaskId();
+        }
         getPlugin().getGameManager().addRunningGame(this);
     }
 
@@ -204,7 +206,9 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         }
         onGameEnd(endEvent);
         running = false;
-        Bukkit.getScheduler().cancelTask(task);
+        if (getOptionInt(GameOption.TPS) != -1) {
+            Bukkit.getScheduler().cancelTask(task);
+        }
         List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>(this.players);
         for (GamePlayer player : gamePlayers) {
             getUserInterfaceHandler().destroy(player);
@@ -464,6 +468,21 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
                 getUserInterfaceHandler().error(ex);
                 stop(); // Games with errors are stopped to avoid spam
             }
+        }
+    }
+
+    /**
+     * Force update of state
+     */
+    public void forceUpdate() {
+        ticks++;
+        // Game loop
+        gameStateTicks++;
+        loop();
+
+        // Handle update
+        if (isRunning()) {
+            getUserInterfaceHandler().update(playerCanvas);
         }
     }
 

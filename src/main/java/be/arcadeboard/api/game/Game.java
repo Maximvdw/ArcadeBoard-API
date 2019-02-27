@@ -472,17 +472,22 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
     }
 
     /**
-     * Force update of state
+     * Force update of game
      */
-    public void forceUpdate() {
-        ticks++;
-        // Game loop
-        gameStateTicks++;
-        loop();
+    public final void forceUpdate() {
+        try {
+            ticks++;
+            // Game loop
+            gameStateTicks++;
+            loop();
 
-        // Handle update
-        if (isRunning()) {
-            getUserInterfaceHandler().update(playerCanvas);
+            // Handle update
+            if (isRunning()) {
+                getUserInterfaceHandler().update(playerCanvas);
+            }
+        } catch (Exception ex) {
+            getUserInterfaceHandler().error(ex);
+            stop(); // Games with errors are stopped to avoid spam
         }
     }
 

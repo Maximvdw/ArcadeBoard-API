@@ -215,6 +215,8 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         }
         players.clear();
         playerCanvas.clear();
+        playerStates.clear();
+        playerStateTicks.clear();
         getPlugin().getGameManager().removeRunningGame(this);
     }
 

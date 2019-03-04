@@ -90,6 +90,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         if (plugin != null) {
             setPlugin(plugin);
         }
+
         setOption(GameOption.TPS, 20);                                      // Default TPS (20 ticks per second)
         setOption(GameOption.ENABLED, true);                                // Game is default enabled
         setOption(GameOption.GLOBAL_CANVAS, true);                          // Game uses one canvas by default
@@ -123,6 +124,12 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
                 }
             }
             annotatedClass = annotatedClass.getSuperclass();
+        }
+
+        // Configuration
+        if (plugin != null && !getName().isEmpty()) {
+            dataFolder = new File(getPlugin().getGamesDirectory(), getName());
+            configFile = new File(dataFolder, "config.yml");
         }
     }
 

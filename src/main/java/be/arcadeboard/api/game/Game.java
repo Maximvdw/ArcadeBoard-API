@@ -217,9 +217,13 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
             Bukkit.getScheduler().cancelTask(task);
         }
         List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>(this.players);
-        for (GamePlayer player : gamePlayers) {
-            getUserInterfaceHandler().destroy(player);
-        }
+        Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
+            public void run() {
+                for (GamePlayer player : gamePlayers) {
+                    getUserInterfaceHandler().destroy(player);
+                }
+            }
+        });
         players.clear();
         playerCanvas.clear();
         playerStates.clear();
@@ -603,7 +607,11 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
             if (players.size() < 1) {
                 stop();
             }
-            getUserInterfaceHandler().destroy(gamePlayer);
+            Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
+                public void run() {
+                    getUserInterfaceHandler().destroy(gamePlayer);
+                }
+            });
             return true;
         }
         return false;

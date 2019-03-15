@@ -53,6 +53,9 @@ public abstract class Menu implements Game.KeyListener, GamePlayerState, Game.Mo
         if (!getGamePlayer().equals(gamePlayer)) {
             return;
         }
+        if (getSelectedItem() == null) {
+            return;
+        }
 
         // Avoid other menu's triggering
         event.setCancelled(true);
@@ -121,6 +124,9 @@ public abstract class Menu implements Game.KeyListener, GamePlayerState, Game.Mo
     public void onMouseMove(MouseMoveEvent event) {
         GamePlayer gamePlayer = event.getGamePlayer();
         if (!getGamePlayer().equals(gamePlayer)) {
+            return;
+        }
+        if (getSelectedItem() == null) {
             return;
         }
 

@@ -47,6 +47,16 @@ public interface GamePlayer extends Serializable {
     /**
      * Play a sound for the player
      *
+     * @param sound  Sound to play
+     * @param volume Volume of the sound
+     * @param pitch  Pitch of the sound
+     */
+    @Deprecated
+    void playSound(org.bukkit.Sound sound, int volume, int pitch);
+
+    /**
+     * Play a sound for the player
+     *
      * @param sound    Sound to play
      * @param category Category to play on
      * @param volume   Volume of the sound

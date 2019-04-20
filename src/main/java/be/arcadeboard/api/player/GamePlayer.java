@@ -5,8 +5,8 @@ import be.arcadeboard.api.game.statistics.Statistic;
 import be.arcadeboard.api.game.GameInformation;
 import be.arcadeboard.api.game.statistics.StatisticType;
 import be.arcadeboard.api.music.NoteBlockSong;
+import be.arcadeboard.api.music.Sound;
 import be.arcadeboard.api.resources.ResourceSound;
-import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 

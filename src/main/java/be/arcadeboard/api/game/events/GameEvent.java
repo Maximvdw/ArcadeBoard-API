@@ -10,6 +10,7 @@ public class GameEvent extends Event {
     private boolean cancelled = false;
 
     public GameEvent(Game game){
+        super(true);
         setGame(game);
     }
 

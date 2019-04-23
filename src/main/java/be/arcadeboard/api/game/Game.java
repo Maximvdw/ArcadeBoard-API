@@ -206,29 +206,29 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * Stop the game
      */
     public final void stop() {
+        GameEndEvent endEvent = new GameEndEvent(this);
+        Bukkit.getPluginManager().callEvent(endEvent);
+        if (endEvent.isCancelled()) {
+            return;
+        }
+        onGameEnd(endEvent);
+        running = false;
+        if (getOptionInt(GameOption.TPS) != -1) {
+            Bukkit.getScheduler().cancelTask(task);
+        }
+        List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>(this.players);
         Bukkit.getScheduler().runTask(getPlugin(), new Runnable() {
             public void run() {
-                GameEndEvent endEvent = new GameEndEvent(Game.this);
-                Bukkit.getPluginManager().callEvent(endEvent);
-                if (endEvent.isCancelled()) {
-                    return;
-                }
-                onGameEnd(endEvent);
-                running = false;
-                if (getOptionInt(GameOption.TPS) != -1) {
-                    Bukkit.getScheduler().cancelTask(task);
-                }
-                List<GamePlayer> gamePlayers = new ArrayList<GamePlayer>(Game.this.players);
                 for (GamePlayer player : gamePlayers) {
                     getUserInterfaceHandler().destroy(player);
                 }
-                players.clear();
-                playerCanvas.clear();
-                playerStates.clear();
-                playerStateTicks.clear();
-                getPlugin().getGameManager().removeRunningGame(Game.this);
             }
         });
+        players.clear();
+        playerCanvas.clear();
+        playerStates.clear();
+        playerStateTicks.clear();
+        getPlugin().getGameManager().removeRunningGame(this);
     }
 
     /**

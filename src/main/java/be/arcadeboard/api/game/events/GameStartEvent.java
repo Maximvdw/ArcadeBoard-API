@@ -5,7 +5,7 @@ import org.bukkit.event.Cancellable;
 
 public class GameStartEvent extends GameEvent implements Cancellable{
     public GameStartEvent(Game game) {
-        super(game);
+        super(game,true);
     }
 
     public boolean isCancelled() {

@@ -7,6 +7,6 @@ import be.arcadeboard.api.player.events.GamePlayerEvent;
 public class GamePlayerJoinEvent extends GamePlayerEvent {
 
     public GamePlayerJoinEvent(Game game, GamePlayer gamePlayer) {
-        super(game, gamePlayer);
+        super(game, gamePlayer,false);
     }
 }

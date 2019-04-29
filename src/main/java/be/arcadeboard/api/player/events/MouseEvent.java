@@ -9,6 +9,6 @@ import be.arcadeboard.api.player.GamePlayer;
  */
 public class MouseEvent extends GamePlayerEvent{
     public MouseEvent(Game game, GamePlayer gamePlayer) {
-        super(game, gamePlayer);
+        super(game, gamePlayer,false);
     }
 }

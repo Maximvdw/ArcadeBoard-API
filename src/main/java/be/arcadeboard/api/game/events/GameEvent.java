@@ -9,8 +9,8 @@ public class GameEvent extends Event {
     private Game game = null;
     private boolean cancelled = false;
 
-    public GameEvent(Game game){
-        super(true);
+    public GameEvent(Game game, boolean async){
+        super(async);
         setGame(game);
     }
 

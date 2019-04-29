@@ -7,8 +7,8 @@ import be.arcadeboard.api.game.events.GameEvent;
 public class GamePlayerEvent extends GameEvent{
     private GamePlayer gamePlayer = null;
 
-    public GamePlayerEvent(Game game, GamePlayer gamePlayer) {
-        super(game);
+    public GamePlayerEvent(Game game, GamePlayer gamePlayer, boolean async) {
+        super(game,async);
         setGamePlayer(gamePlayer);
     }
 

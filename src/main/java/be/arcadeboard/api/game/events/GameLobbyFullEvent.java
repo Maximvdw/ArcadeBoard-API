@@ -6,7 +6,7 @@ public class GameLobbyFullEvent extends GameEvent {
     private GameLobby lobby = null;
 
     public GameLobbyFullEvent(GameLobby gameLobby) {
-        super(gameLobby.getGame());
+        super(gameLobby.getGame(),false);
         setLobby(gameLobby);
     }
 

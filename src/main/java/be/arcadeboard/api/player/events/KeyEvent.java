@@ -12,7 +12,7 @@ public class KeyEvent extends GamePlayerEvent {
     private Key key = null;
 
     public KeyEvent(Game game, GamePlayer gamePlayer, Key key) {
-        super(game, gamePlayer);
+        super(game, gamePlayer,true);
         setKey(key);
     }
 

@@ -10,7 +10,7 @@ import be.arcadeboard.api.player.GamePlayer;
  */
 public class KeyDownEvent extends KeyEvent {
 
-    public KeyDownEvent(Game game, GamePlayer gamePlayer, Key key) {
-        super(game, gamePlayer,key);
+    public KeyDownEvent(Game game, GamePlayer gamePlayer, Key key, boolean async) {
+        super(game, gamePlayer,key, async);
     }
 }

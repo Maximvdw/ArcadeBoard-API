@@ -11,8 +11,8 @@ import be.arcadeboard.api.player.GamePlayer;
 public class KeyEvent extends GamePlayerEvent {
     private Key key = null;
 
-    public KeyEvent(Game game, GamePlayer gamePlayer, Key key) {
-        super(game, gamePlayer,true);
+    public KeyEvent(Game game, GamePlayer gamePlayer, Key key, boolean async) {
+        super(game, gamePlayer,async);
         setKey(key);
     }
 

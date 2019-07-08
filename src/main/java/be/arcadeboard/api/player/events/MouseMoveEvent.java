@@ -10,8 +10,8 @@ public class MouseMoveEvent extends MouseEvent {
     private float deltaX = 0F;
     private float deltaY = 0F;
 
-    public MouseMoveEvent(Game game, GamePlayer gamePlayer, float deltaX, float deltaY) {
-        super(game, gamePlayer);
+    public MouseMoveEvent(Game game, GamePlayer gamePlayer, float deltaX, float deltaY, boolean async) {
+        super(game, gamePlayer, async);
         setDeltaX(deltaX);
         setDeltaY(deltaY);
     }

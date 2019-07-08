@@ -10,8 +10,8 @@ import be.arcadeboard.api.game.Game;
 public class MouseClickEvent extends MouseEvent {
     private MouseKey mouseKey = null;
 
-    public MouseClickEvent(Game game, GamePlayer gamePlayer, MouseKey mouseKey) {
-        super(game, gamePlayer);
+    public MouseClickEvent(Game game, GamePlayer gamePlayer, MouseKey mouseKey, boolean async) {
+        super(game, gamePlayer, async);
         setMouseKey(mouseKey);
     }
 

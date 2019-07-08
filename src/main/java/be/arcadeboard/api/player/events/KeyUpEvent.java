@@ -9,7 +9,7 @@ import be.arcadeboard.api.game.Game;
  * Created by Maxim on 8/01/2018.
  */
 public class KeyUpEvent extends KeyEvent {
-    public KeyUpEvent(Game game, GamePlayer gamePlayer, KeyEvent.Key key) {
-        super(game, gamePlayer,key);
+    public KeyUpEvent(Game game, GamePlayer gamePlayer, KeyEvent.Key key, boolean async) {
+        super(game, gamePlayer,key,async);
     }
 }

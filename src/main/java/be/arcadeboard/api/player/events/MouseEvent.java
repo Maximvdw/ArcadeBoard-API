@@ -8,7 +8,7 @@ import be.arcadeboard.api.player.GamePlayer;
  * Created by Maxim on 8/01/2018.
  */
 public class MouseEvent extends GamePlayerEvent{
-    public MouseEvent(Game game, GamePlayer gamePlayer) {
-        super(game, gamePlayer,false);
+    public MouseEvent(Game game, GamePlayer gamePlayer, boolean async) {
+        super(game, gamePlayer,async);
     }
 }

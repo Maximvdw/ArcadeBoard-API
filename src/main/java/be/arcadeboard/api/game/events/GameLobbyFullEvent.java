@@ -5,8 +5,8 @@ import be.arcadeboard.api.game.GameLobby;
 public class GameLobbyFullEvent extends GameEvent {
     private GameLobby lobby = null;
 
-    public GameLobbyFullEvent(GameLobby gameLobby) {
-        super(gameLobby.getGame(),false);
+    public GameLobbyFullEvent(GameLobby gameLobby, boolean async) {
+        super(gameLobby.getGame(),async);
         setLobby(gameLobby);
     }
 

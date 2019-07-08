@@ -6,7 +6,7 @@ import be.arcadeboard.api.player.events.GamePlayerEvent;
 
 public class GamePlayerLeaveEvent extends GamePlayerEvent {
 
-    public GamePlayerLeaveEvent(Game game, GamePlayer gamePlayer) {
-        super(game, gamePlayer,false);
+    public GamePlayerLeaveEvent(Game game, GamePlayer gamePlayer, boolean async) {
+        super(game, gamePlayer,async);
     }
 }

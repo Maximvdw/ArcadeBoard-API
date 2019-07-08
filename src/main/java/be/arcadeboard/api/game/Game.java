@@ -206,7 +206,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * Stop the game
      */
     public final void stop() {
-        GameEndEvent endEvent = new GameEndEvent(this,!Bukkit.isPrimaryThread());
+        GameEndEvent endEvent = new GameEndEvent(this, !Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(endEvent);
         if (endEvent.isCancelled()) {
             return;
@@ -564,7 +564,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
             playerCanvas.put(gamePlayer, createCanvas(getOptionInt(GameOption.SCREEN_WIDTH), getOptionInt(GameOption.SCREEN_HEIGHT)));
         }
         players.add(gamePlayer);
-        GamePlayerJoinEvent playerJoinEvent = new GamePlayerJoinEvent(this, gamePlayer);
+        GamePlayerJoinEvent playerJoinEvent = new GamePlayerJoinEvent(this, gamePlayer, !Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(playerJoinEvent);
         onPlayerJoin(playerJoinEvent);
         if (playerJoinEvent.isCancelled()) {
@@ -594,7 +594,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * @return success
      */
     public final boolean removePlayer(GamePlayer gamePlayer) {
-        GamePlayerLeaveEvent gamePlayerLeaveEvent = new GamePlayerLeaveEvent(this, gamePlayer);
+        GamePlayerLeaveEvent gamePlayerLeaveEvent = new GamePlayerLeaveEvent(this, gamePlayer, !Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(gamePlayerLeaveEvent);
         onPlayerLeave(gamePlayerLeaveEvent);
 

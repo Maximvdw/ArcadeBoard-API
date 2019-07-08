@@ -180,7 +180,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         if (getPlugin() == null)
             return;
 
-        GameStartEvent startEvent = new GameStartEvent(this);
+        GameStartEvent startEvent = new GameStartEvent(this, !Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(startEvent);
         if (startEvent.isCancelled()) {
             return;
@@ -206,7 +206,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
      * Stop the game
      */
     public final void stop() {
-        GameEndEvent endEvent = new GameEndEvent(this);
+        GameEndEvent endEvent = new GameEndEvent(this,!Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(endEvent);
         if (endEvent.isCancelled()) {
             return;

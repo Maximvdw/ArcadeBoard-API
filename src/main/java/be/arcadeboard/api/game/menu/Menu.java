@@ -76,7 +76,9 @@ public abstract class Menu implements Game.KeyListener, GamePlayerState, Game.Mo
                 }
                 break;
             case JUMP:
-                getSelectedItem().onClick(gamePlayer);
+                if (getSelectedItem() != null) {
+                    getSelectedItem().onClick(gamePlayer);
+                }
                 break;
             case SNEAK:
                 onForceQuit(gamePlayer);

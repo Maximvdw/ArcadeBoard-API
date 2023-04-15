@@ -7,7 +7,7 @@ an All rights received.
 More information about the license is covered below. To summarize the license:
 1) You may create and sell games that use the API as long as you provide them with this license and the game does not include the implementation part of this API.
 
-Copyright 2017-2019 Maxim Van de Wynckel and contributors.
+Copyright 2017-2023 Maxim Van de Wynckel and contributors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

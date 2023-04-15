@@ -212,6 +212,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
             return;
         }
         onGameEnd(endEvent);
+
         running = false;
         if (getOptionInt(GameOption.TPS) != -1) {
             Bukkit.getScheduler().cancelTask(task);

@@ -25,7 +25,7 @@ public interface UserInterfaceHandler<T extends Canvas> {
      * Fired when the game is stopped
      * individually for each player
      *
-     * @param player GAme player
+     * @param player Game player
      */
     void destroy(GamePlayer player);
 

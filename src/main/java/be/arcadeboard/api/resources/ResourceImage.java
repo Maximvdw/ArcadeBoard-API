@@ -15,7 +15,7 @@ public class ResourceImage {
     protected BufferedImage image = null;
     private ResourceIcon[][] icons = new ResourceIcon[0][0];
 
-    public ResourceImage(String name, BufferedImage image) throws IOException {
+    public ResourceImage(String name, BufferedImage image) {
         setName(name);
         setImage(image);
     }
@@ -108,7 +108,7 @@ public class ResourceImage {
         // Split image
         int heightDiff = this.image.getHeight() % 16;
         int widthDiff = this.image.getWidth() % 16;
-        if (heightDiff == 0 && widthDiff % 16 == 0){
+        if (heightDiff == 0 && widthDiff % 16 == 0) {
             // Correct dimensions
             final int width = 16;
             final int height = 16;
@@ -130,9 +130,9 @@ public class ResourceImage {
                     }
                 }
             }
-        }else{
+        } else {
             // Pad image
-            BufferedImage newImage = new BufferedImage(this.image.getWidth() + widthDiff, this.image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage newImage = new BufferedImage(this.image.getWidth() + widthDiff, this.image.getHeight() + heightDiff, BufferedImage.TYPE_INT_ARGB);
             // Center image
             newImage.getGraphics().drawImage(image, widthDiff / 2, heightDiff / 2, null);
             setImage(newImage);

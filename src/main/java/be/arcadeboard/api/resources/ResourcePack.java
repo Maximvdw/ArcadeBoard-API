@@ -17,11 +17,11 @@ import java.util.*;
  */
 public class ResourcePack {
     private String name = "";
-    private Map<String, BufferedImage> iconHexMap = new HashMap<String, BufferedImage>();
+    private final Map<String, BufferedImage> iconHexMap = new HashMap<String, BufferedImage>();
     private Map<String, ResourceSound> soundNameMap = new HashMap<String, ResourceSound>();
 
-    private Map<String, ResourceIcon> iconNameMap = new HashMap<String, ResourceIcon>();
-    private Map<String, ResourceImage> imageNameMap = new HashMap<String, ResourceImage>();
+    private final Map<String, ResourceIcon> iconNameMap = new HashMap<String, ResourceIcon>();
+    private final Map<String, ResourceImage> imageNameMap = new HashMap<String, ResourceImage>();
     private Map<String, ResourceFont> fontNameMap = new HashMap<String, ResourceFont>();
 
     private final Map<String, Boolean> pages = new TreeMap<String, Boolean>();
@@ -345,11 +345,7 @@ public class ResourcePack {
      * @return Sound if found
      */
     public ResourceSound getSoundByName(String name) {
-        if (soundNameMap.containsKey(name)) {
-            return soundNameMap.get(name);
-        } else {
-            return null;
-        }
+        return soundNameMap.getOrDefault(name, null);
     }
 
     /**
@@ -359,11 +355,7 @@ public class ResourcePack {
      * @return Icon if found
      */
     public ResourceIcon getIconByName(String name) {
-        if (iconNameMap.containsKey(name.toUpperCase())) {
-            return iconNameMap.get(name.toUpperCase());
-        } else {
-            return null;
-        }
+        return iconNameMap.getOrDefault(name.toUpperCase(), null);
     }
 
     /**
@@ -373,11 +365,7 @@ public class ResourcePack {
      * @return Image if found
      */
     public ResourceImage getImageByName(String name) {
-        if (imageNameMap.containsKey(name.toUpperCase())) {
-            return imageNameMap.get(name.toUpperCase());
-        } else {
-            return null;
-        }
+        return imageNameMap.getOrDefault(name.toUpperCase(), null);
     }
 
 
@@ -393,17 +381,11 @@ public class ResourcePack {
             addIcon(icon.getKey(), icon.getValue(), icon.getValue().isAllowRotation());
         }
         // Merge images
-        for (Map.Entry<String, ResourceImage> image : resourcePack.getImageNameMap().entrySet()) {
-            imageNameMap.put(image.getKey(), image.getValue());
-        }
+        imageNameMap.putAll(resourcePack.getImageNameMap());
         // Merge fonts
-        for (Map.Entry<String, ResourceFont> font : resourcePack.getFontNameMap().entrySet()) {
-            fontNameMap.put(font.getKey(), font.getValue());
-        }
+        fontNameMap.putAll(resourcePack.getFontNameMap());
         // Merge sounds
-        for (Map.Entry<String, ResourceSound> sound : resourcePack.getSoundNameMap().entrySet()) {
-            soundNameMap.put(sound.getKey(), sound.getValue());
-        }
+        soundNameMap.putAll(resourcePack.getSoundNameMap());
         // Increment version
         setVersion(getVersion() + resourcePack.getVersion());
     }

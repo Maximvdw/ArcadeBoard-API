@@ -108,8 +108,8 @@ public class ResourceImage {
         // Split image
         int heightDiff = this.image.getHeight() % 16;
         int widthDiff = this.image.getWidth() % 16;
-        if (heightDiff == 0 && widthDiff % 16 == 0) {
-            // Correct dimensions
+        if (heightDiff == 0 && widthDiff == 0) {
+            // Correct dimensions or scalable dimensions
             final int width = 16;
             final int height = 16;
             final int rows = this.image.getHeight() / 16;

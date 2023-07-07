@@ -10,7 +10,7 @@ import java.util.List;
 public class ResourceSound {
     private String name = "";
     private String category = "";
-    private List<InputStream> soundStreams = new ArrayList<InputStream>();
+    private final List<InputStream> soundStreams = new ArrayList<InputStream>();
 
     public ResourceSound(String name, File soundFile) throws FileNotFoundException {
         setName(name);

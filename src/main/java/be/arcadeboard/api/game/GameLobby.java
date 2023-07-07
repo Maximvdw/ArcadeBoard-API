@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * GameLobby
- * Created by Maxim on 7/01/2018.
+ * Game lobby
  */
 public class GameLobby {
     private Game<?> game = null;
@@ -35,7 +34,7 @@ public class GameLobby {
      *
      * @param game Game
      */
-    public void setGame(Game game) {
+    public void setGame(Game<?> game) {
         this.game = game;
     }
 

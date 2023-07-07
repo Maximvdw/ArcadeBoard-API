@@ -162,6 +162,15 @@ public interface GameManager {
     void playGame(GamePlayer gamePlayer, GameInformation gameInformation);
 
     /**
+     * Switch to another game
+     *
+     * @param gamePlayer        Player that wants to play
+     * @param currentGame       Game the player is currently playing
+     * @param gameInformation   Game that the player wants to play
+     */
+    void switchGame(GamePlayer gamePlayer, GameInformation currentGame, GameInformation gameInformation);
+
+    /**
      * Get top statistics
      *
      * @param game     Game to get top statistics of

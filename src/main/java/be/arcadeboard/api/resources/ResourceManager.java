@@ -1,8 +1,7 @@
 package be.arcadeboard.api.resources;
 
 /**
- * ResourceManager
- * Created by Maxim on 14/01/2018.
+ * Resource manager manages the resource pack(s) of ArcadeBoard and merging of games in one resource pack
  */
 public interface ResourceManager {
     /**

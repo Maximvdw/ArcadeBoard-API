@@ -6,12 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * PresetColor
- * Created by Maxim on 18/01/2018.
- */
 public class ColorResource extends ResourceIcon {
-    private static List<ColorResource> values = new ArrayList<ColorResource>();
+    private static final List<ColorResource> values = new ArrayList<ColorResource>();
 
     public final static ColorResource BLACK = addFromAWTColor("BLACK", new Color(0, 0, 0));
     public final static ColorResource DARK_BLUE = addFromAWTColor("DARK_BLUE", new Color(0, 0, 170));
@@ -44,7 +40,7 @@ public class ColorResource extends ResourceIcon {
     public final static ColorResource YELLOW_SHADE = addFromAWTColor("YELLOW_SHADE", new Color(63, 63, 21));
     public final static ColorResource WHITE = addFromAWTColor("WHITE", new Color(255, 255, 255));
     public final static ColorResource WHITE_SHADE = addFromAWTColor("WHITE_SHADE", new Color(63, 63, 63));
-    public final static ColorResource TRANSPARENT = addFromAWTColor("TRANSPARENT", new Color(0, 0, 0, 0));
+    public final static ColorResource TRANSPARENT = addFromAWTColor("TRANSPARENT", new Color(0, 0, 0, 1));
 
     private ColorResource(String name, BufferedImage image) throws IOException {
         super(name, image);
@@ -69,10 +65,23 @@ public class ColorResource extends ResourceIcon {
      * @return Preset color
      */
     private static ColorResource addFromAWTColor(String name, Color color) {
-        try {
-            ColorResource icon = new ColorResource(name, getPixelImage(color));
+        ColorResource icon = createFromAWTColor(name, color);
+        if (icon != null) {
             values.add(icon);
-            return icon;
+        }
+        return icon;
+    }
+
+    /**
+     * Create color resource from AWT color
+     *
+     * @param name  Preset color name
+     * @param color Color name
+     * @return Preset color
+     */
+    public static ColorResource createFromAWTColor(String name, Color color) {
+        try {
+            return new ColorResource(name, getPixelImage(color));
         } catch (IOException e) {
             e.printStackTrace();
         }

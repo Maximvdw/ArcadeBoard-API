@@ -10,20 +10,20 @@ import java.util.Map;
 public class ResourceFont {
     private static ResourceFont defaultFont = null;
 
-    /** Default font **/
+    // Default font
     static {
         try {
-            defaultFont = new ResourceFont("default", ResourceFont.class.getResourceAsStream("/fonts/default.ttf"), 20);
+            defaultFont = new ResourceFont("default", ResourceFont.class.getResourceAsStream("/resourcepack/fonts/default.ttf"), 20);
         } catch (IOException | FontFormatException e) {
             e.printStackTrace();
         }
     }
 
-    private Map<Character, ResourceIcon> characters = new HashMap<Character, ResourceIcon>();
+    private final Map<Character, ResourceIcon> characters = new HashMap<Character, ResourceIcon>();
     private String name = "";
     private Font font = null;
     private int fontSize = 16;
-    private Color fontColor = Color.WHITE;
+    private final Color fontColor = Color.WHITE;
 
     public ResourceFont(String name, InputStream is, float fontSize) throws IOException, FontFormatException {
         this(name, Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(fontSize));
@@ -73,7 +73,9 @@ public class ResourceFont {
     }
 
     public void addCharacter(Character character) throws IOException {
-        this.characters.put(character, new ResourceIcon("FONT_" + name + "_" + character, getCharacterAsImage(character)));
+        ResourceIcon icon =  new ResourceIcon("FONT_" + name + "_" + Integer.toHexString((int) character), getCharacterAsImage(character));
+        icon.setBorders(true);
+        this.characters.put(character, icon);
     }
 
     private BufferedImage getCharacterAsImage(Character character) {
@@ -88,7 +90,7 @@ public class ResourceFont {
             FontMetrics fontMetrics = g.getFontMetrics();
             int width = fontMetrics.charWidth(character);
             int height = fontMetrics.getHeight();
-            int x = (int) (8 - Math.floor(width / 2));
+            int x = (int) (8 - Math.floor(width / 2.));
             int y = 16 - ((16 - height) / 2) - 3;
             g.drawString(character.toString(), x, y);
         }

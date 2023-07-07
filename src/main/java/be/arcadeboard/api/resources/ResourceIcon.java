@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class ResourceIcon extends ResourceImage {
-    private String hex = "";
-    private byte startIdx = 0;
-    private byte endIdx = 15;
     private boolean allowRotation = false;
+    private boolean borders = false;
 
     public ResourceIcon(String name, BufferedImage image) throws IOException {
         super(name, image);
@@ -24,26 +22,15 @@ public class ResourceIcon extends ResourceImage {
     }
 
     /**
-     * Set icon image
-     *
-     * @param image icon image
-     */
-    @Override
-    public void setImage(BufferedImage image) {
-        if (image.getHeight() != 16 || image.getWidth() != 16) {
-            // TODO: Not correct size, resize
-        } else {
-            this.image = image;
-        }
-    }
-
-    /**
      * Get character
      *
      * @return character
      */
     public char getCharacter() {
-        return (char) Integer.parseInt(hex, 16);
+        if (getHex().isEmpty()) {
+            return (char) 0;
+        }
+        return (char) Integer.parseInt(getHex(), 16);
     }
 
     /**
@@ -64,19 +51,6 @@ public class ResourceIcon extends ResourceImage {
      */
     public char getCharacter(int rotation) {
         return (char) Integer.parseInt(getHex(rotation), 16);
-    }
-
-    public String getHex() {
-        return hex;
-    }
-
-    /**
-     * Set hex
-     *
-     * @param hex Hex
-     */
-    public void setHex(String hex) {
-        this.hex = hex;
     }
 
     @Override
@@ -118,42 +92,36 @@ public class ResourceIcon extends ResourceImage {
     }
 
     /**
-     * Get the end index position of the icon
-     * Default: 15
+     * Get resource icon width
      *
-     * @return end index position
+     * @return Icon width
      */
-    public byte getEndIndex() {
-        return endIdx;
+    @Override
+    public int getHeight() {
+        if (hasBorders()) {
+            return super.getHeight();
+        }
+        return super.getHeight() + 1;
     }
 
     /**
-     * Set the end index position of the icon
-     * Default: 15
+     * Get resource icon width
      *
-     * @param endIdx end index position
+     * @return Icon width
      */
-    public void setEndIndex(byte endIdx) {
-        this.endIdx = endIdx;
+    @Override
+    public int getWidth() {
+        if (hasBorders()) {
+            return super.getWidth();
+        }
+        return super.getWidth() + 1;
     }
 
-    /**
-     * Get the start index position of the icon
-     * Default: 0
-     *
-     * @return start index position
-     */
-    public byte getStartIndex() {
-        return startIdx;
+    public boolean hasBorders() {
+        return borders;
     }
 
-    /**
-     * Set the start index position of the icon
-     * Default: 0
-     *
-     * @param startIdx start index position
-     */
-    public void setStartIndex(byte startIdx) {
-        this.startIdx = startIdx;
+    public void setBorders(boolean borders) {
+        this.borders = borders;
     }
 }

@@ -147,6 +147,16 @@ public interface GamePlayer extends Serializable {
     String getGameData(GameInformation game, String key);
 
     /**
+     * Get persistent game data
+     *
+     * @param game Game
+     * @param key  Key
+     * @param value Default value
+     * @return data
+     */
+    String getGameData(GameInformation game, String key, Object defaultValue);
+
+    /**
      * Store persistent game data
      *
      * @param game  Game
@@ -162,6 +172,15 @@ public interface GamePlayer extends Serializable {
      * @return data
      */
     String getGlobalSetting(String key);
+
+    /**
+     * Get persistent player settings
+     *
+     * @param key Key
+     * @param defaultValue Default value
+     * @return data
+     */
+    String getGlobalSetting(String key, Object defaultValue);
 
     /**
      * Store persistent setting data

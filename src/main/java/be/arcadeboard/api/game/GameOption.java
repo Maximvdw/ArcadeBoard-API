@@ -76,7 +76,12 @@ public enum GameOption {
      * Visibility in the game menu
      * Default: true
      */
-    VISIBLE(Boolean.class);
+    VISIBLE(Boolean.class),
+    /**
+     * Enable centering of the game
+     * Default: true
+     */
+    CENTERING(Boolean.class);
 
     private Class<?> type = Object.class;
 

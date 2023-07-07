@@ -65,23 +65,23 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
     private long gameStateTicks = 0L;
 
     // Ordered player lists
-    private List<GamePlayer> players = new ArrayList<GamePlayer>();
-    private Map<GamePlayer, GamePlayerState> playerStates = new HashMap<GamePlayer, GamePlayerState>();
-    private Map<GamePlayer, Long> playerStateTicks = new HashMap<GamePlayer, Long>();
+    private final List<GamePlayer> players = new ArrayList<GamePlayer>();
+    private final Map<GamePlayer, GamePlayerState> playerStates = new HashMap<GamePlayer, GamePlayerState>();
+    private final Map<GamePlayer, Long> playerStateTicks = new HashMap<GamePlayer, Long>();
 
     // Player data specific to game
-    private Map<GamePlayer, T> playerCanvas = new ConcurrentHashMap<GamePlayer, T>();
+    private final Map<GamePlayer, T> playerCanvas = new ConcurrentHashMap<GamePlayer, T>();
     private Class<T> canvasClass;
 
     // Listeners
-    private List<MouseClickListener> mouseClickListeners = new ArrayList<MouseClickListener>();
-    private List<MouseMoveListener> mouseMoveListeners = new ArrayList<MouseMoveListener>();
-    private List<KeyDownListener> keyDownListeners = new ArrayList<KeyDownListener>();
-    private List<KeyUpListener> keyUpListeners = new ArrayList<KeyUpListener>();
+    private final List<MouseClickListener> mouseClickListeners = new ArrayList<MouseClickListener>();
+    private final List<MouseMoveListener> mouseMoveListeners = new ArrayList<MouseMoveListener>();
+    private final List<KeyDownListener> keyDownListeners = new ArrayList<KeyDownListener>();
+    private final List<KeyUpListener> keyUpListeners = new ArrayList<KeyUpListener>();
 
     // Game options
-    private Map<GameOption, Object> gameOptions = new HashMap<GameOption, Object>();
-    private Map<String, Object> customGameSettings = new TreeMap<String, Object>();
+    private final Map<GameOption, Object> gameOptions = new HashMap<GameOption, Object>();
+    private final Map<String, Object> customGameSettings = new TreeMap<String, Object>();
 
     // Running task
     private int task = -1;
@@ -98,6 +98,7 @@ public abstract class Game<T extends Canvas> extends GameInformation implements 
         setOption(GameOption.MAXIMUM_PLAYERS, 1);                           // Game has a maximum amount of players of 1
         setOption(GameOption.BACKGROUND, GameOption.Choice.OPT_OUT);
         setOption(GameOption.VISIBLE, true);
+        setOption(GameOption.CENTERING, true);
 
         setGameClass((Class<? extends Game>) this.getClass().getSuperclass());
 

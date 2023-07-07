@@ -12,11 +12,11 @@ import java.util.*;
 /**
  * Resource pack
  * <p>
- * This resource pack contains the icons and version information information
+ * This resource pack contains the icons and version information
  * it is later merged into one resource pack
  */
 public class ResourcePack {
-    private String name = "";
+    private String name = "default";
     private final Map<String, BufferedImage> iconHexMap = new HashMap<String, BufferedImage>();
     private Map<String, ResourceSound> soundNameMap = new HashMap<String, ResourceSound>();
 
@@ -28,6 +28,7 @@ public class ResourcePack {
     private int currentCharacterIndex = 37120;
     private int version = 1;
 
+    @Deprecated
     public ResourcePack() {
 
     }
@@ -37,9 +38,8 @@ public class ResourcePack {
         setVersion(version);
     }
 
-    public ResourcePack(Game game, int resourcePackVersion) {
-        setVersion(resourcePackVersion);
-        setName(game.getName());
+    public ResourcePack(Game<?> game, int version) {
+        this(game.getName(), version);
     }
 
 
@@ -48,9 +48,8 @@ public class ResourcePack {
      *
      * @param resourceFont resource font
      * @return resource font
-     * @throws IOException
      */
-    public ResourceFont addFont(ResourceFont resourceFont) throws IOException {
+    public ResourceFont addFont(ResourceFont resourceFont) {
         fontNameMap.put(resourceFont.getName(), resourceFont);
         for (ResourceIcon icon : resourceFont.getCharacters().values()) {
             addIcon(icon.getName(), icon, icon.isAllowRotation());
@@ -113,7 +112,7 @@ public class ResourcePack {
      * @throws IOException
      */
     public ResourceImage addImage(ResourceImage resourceImage) throws IOException {
-        return addImage(resourceImage.getName(), resourceImage.getImage());
+        return addImage(resourceImage.getName(), resourceImage, false);
     }
 
     /**
@@ -170,26 +169,33 @@ public class ResourcePack {
      * @param allowRotation Allow rotation
      * @return ResourceIcon
      */
-    public ResourceImage addImage(String name, ResourceImage image, boolean allowRotation) throws IOException {
-        for (int i = 0; i < image.getIcons().length; i++) {
-            for (int j = 0; j < image.getIcons()[i].length; j++) {
-                ResourceIcon icon = image.getIcons()[i][j];
-                icon.setAllowRotation(allowRotation);
-                icon.setHex(Integer.toHexString(currentCharacterIndex++));
-                iconNameMap.put(icon.getName().toUpperCase(), icon);
-                pages.put(icon.getHex().substring(0, 2), true);
-                iconHexMap.put(icon.getHex(), icon.getImage());
-                if (allowRotation) {
-                    iconHexMap.put(icon.getHex(1), icon.getImage(1));
-                    iconHexMap.put(icon.getHex(2), icon.getImage(2));
-                    iconHexMap.put(icon.getHex(3), icon.getImage(3));
+    public ResourceImage addImage(String name, ResourceImage image, boolean allowRotation) {
+        if (image.isSplit()) {
+            // Split image into icons
+            for (int i = 0; i < image.getIcons().length; i++) {
+                for (int j = 0; j < image.getIcons()[i].length; j++) {
+                    ResourceIcon icon = image.getIcons()[i][j];
+                    icon.setAllowRotation(allowRotation);
+                    icon.setHex(Integer.toHexString(currentCharacterIndex++));
+
+                    iconNameMap.put(icon.getName().toUpperCase(), icon);
+                    pages.put(icon.getHex().substring(0, icon.getHex().length() > 1 ? 2 : 1), true);
+                    iconHexMap.put(icon.getHex(), icon.getImage());
+                    if (allowRotation) {
+                        iconHexMap.put(icon.getHex(1), icon.getImage(1));
+                        iconHexMap.put(icon.getHex(2), icon.getImage(2));
+                        iconHexMap.put(icon.getHex(3), icon.getImage(3));
+                    }
                 }
             }
+        } else {
+            // Consider the image as one
+            image.setHex(Integer.toHexString(currentCharacterIndex++));
+            //iconNameMap.put(image.getName().toUpperCase(), image);
         }
         imageNameMap.put(name.toUpperCase(), image);
         return image;
     }
-
 
     /**
      * Add a new text icon
@@ -210,7 +216,7 @@ public class ResourcePack {
      * @throws IOException
      */
     public ResourceIcon addIcon(ResourceIcon resourceIcon) throws IOException {
-        return addIcon(resourceIcon.getName(), resourceIcon.getImage());
+        return addIcon(resourceIcon.getName(), resourceIcon, false);
     }
 
     /**
@@ -267,12 +273,14 @@ public class ResourcePack {
      * @param allowRotation Allow rotation
      * @return ResourceIcon
      */
-    public ResourceIcon addIcon(String name, ResourceIcon icon, boolean allowRotation) throws IOException {
+    public ResourceIcon addIcon(String name, ResourceIcon icon, boolean allowRotation) {
         icon.setAllowRotation(allowRotation);
         icon.setHex(Integer.toHexString(currentCharacterIndex++));
         iconNameMap.put(name.toUpperCase(), icon);
-        pages.put(icon.getHex().substring(0, 2), true);
+        pages.put(icon.getHex().substring(0, icon.getHex().length() > 1 ? 2 : 1), true);
         iconHexMap.put(icon.getHex(), icon.getImage());
+
+        // Add different rotations to the resource pack
         if (allowRotation) {
             iconHexMap.put(icon.getHex(1), icon.getImage(1));
             iconHexMap.put(icon.getHex(2), icon.getImage(2));
@@ -320,7 +328,7 @@ public class ResourcePack {
         icon.setHex(hex);
         iconHexMap.put(hex, icon.getImage());
         iconNameMap.put(icon.getName().toUpperCase(), icon);
-        pages.put(hex.substring(0, 2), true);
+        pages.put(hex.substring(0, hex.length() > 1 ? 2 : 1), true);
         return icon;
     }
 
@@ -331,11 +339,7 @@ public class ResourcePack {
      * @return Font if found
      */
     public ResourceFont getFontByName(String name) {
-        if (fontNameMap.containsKey(name.toUpperCase())) {
-            return fontNameMap.get(name.toUpperCase());
-        } else {
-            return null;
-        }
+        return fontNameMap.getOrDefault(name.toUpperCase(), null);
     }
 
     /**
@@ -373,9 +377,8 @@ public class ResourcePack {
      * Merge the current resource pack with another
      *
      * @param resourcePack resource pack to merge
-     * @throws IOException
      */
-    public void merge(ResourcePack resourcePack) throws IOException {
+    public void merge(ResourcePack resourcePack) {
         // Merge icons
         for (Map.Entry<String, ResourceIcon> icon : resourcePack.getIconNameMap().entrySet()) {
             addIcon(icon.getKey(), icon.getValue(), icon.getValue().isAllowRotation());

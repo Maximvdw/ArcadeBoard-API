@@ -9,7 +9,6 @@ public enum StatisticType {
      *
      * Can be used in placeholders:
      * PlaceholderAPI:      %arcadeboard_XXXX_statistic_victories%
-     * MVdWPlaceholderAPI:  {arcadeboard_XXXX_statistic_victories}
      * With XXXX being the game name configured with the @GameName annotation
      */
     VICTORIES,
@@ -18,7 +17,6 @@ public enum StatisticType {
      *
      * Can be used in placeholders:
      * PlaceholderAPI:      %arcadeboard_XXXX_statistic_best_score%
-     * MVdWPlaceholderAPI:  {arcadeboard_XXXX_statistic_best_Score}
      * With XXXX being the game name configured with the @GameName annotation
      */
     BEST_SCORE,
@@ -27,7 +25,6 @@ public enum StatisticType {
      *
      * Can be used in placeholders:
      * PlaceholderAPI:      %arcadeboard_XXXX_statistic_defeats%
-     * MVdWPlaceholderAPI:  {arcadeboard_XXXX_statistic_defeats}
      * With XXXX being the game name configured with the @GameName annotation
      */
     DEFEATS,
@@ -36,7 +33,6 @@ public enum StatisticType {
      *
      * Can be used in placeholders:
      * PlaceholderAPI:      %arcadeboard_XXXX_statistic_level%
-     * MVdWPlaceholderAPI:  {arcadeboard_XXXX_statistic_level}
      * With XXXX being the game name configured with the @GameName annotation
      */
     LEVEL
